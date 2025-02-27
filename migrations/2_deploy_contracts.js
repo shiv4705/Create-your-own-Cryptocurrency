@@ -1,5 +1,5 @@
-var DappToken = artifacts.require("./DappToken.sol");
+var ShivToken = artifacts.require("./ShivToken.sol");
 
 module.exports = function(deployer) {
-  deployer.deploy(DappToken, 1000000);
+  deployer.deploy(ShivToken, 1000000);
 };

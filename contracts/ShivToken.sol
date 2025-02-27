@@ -1,9 +1,9 @@
 pragma solidity ^0.4.2;
 
-contract DappToken {
-	string public name = "DApp Token";
-	string public symbol = "DAPP";
-	string public standard = "DApp Token v1.0";
+contract ShivToken {
+	string public name = "Shiv Token";
+	string public symbol = "SHIV";
+	string public standard = "Shiv Token v1.0";
 	uint256 public totalSupply;
 
 	event Transfer(
@@ -14,7 +14,7 @@ contract DappToken {
 
 	mapping(address => uint256) public balanceOf;
 
-	function DappToken(uint256 _initialSupply) public {
+	function ShivToken(uint256 _initialSupply) public {
 		balanceOf[msg.sender] = _initialSupply;
 		totalSupply = _initialSupply;
 	}
@@ -29,4 +29,6 @@ contract DappToken {
 
 		return true;
 	}
+
+	
 }
