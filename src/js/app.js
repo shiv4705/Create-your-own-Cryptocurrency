@@ -20,7 +20,6 @@ App = {
             App.web3Provider = new Web3.providers.HttpProvider('http://localhost:7545');
             web3 = new Web3(App.web3Provider);
         }
-
         return App.initContract();
     },
 
@@ -38,8 +37,22 @@ App = {
                 App.contracts.ShivToken.deployed().then(function (shivTokenInstance) {
                     console.log('Shiv Token Address:', shivTokenInstance.address);
                 });
+                App.listenForEvents();
                 return App.render();
             });
+        })
+    },
+
+    //Listen for events emitted from the contract
+    listenForEvents: function () {
+        App.contracts.ShivTokenSale.deployed().then(function (instance) {
+            instance.Sell({}, {
+                fromBlock: 0,
+                toBlock: 'latest',
+            }).watch(function (error, event) {
+                console.log('event triggered', event);
+                App.render();
+            })
         })
     },
 
@@ -83,11 +96,39 @@ App = {
 
             var progressPercent = (App.tokensSold / App.tokensAvailable) * 100;
             $('#progress').css('width', progressPercent + '%');
-        });
 
-        App.loading = false;
-        loader.hide();
-        content.show();
+            // Load Token Contract
+            App.contracts.ShivToken.deployed().then(function (Instance) {
+                shivTokenInstance = Instance;
+                return shivTokenInstance.balanceOf(App.account);
+            }).then(function (balance) {
+                $('.shiv-balance').html(balance.toNumber());
+                App.loading = false;
+                loader.hide();
+                content.show();
+            })
+        });
+    },
+
+    buyTokens: function () {
+        $('#content').hide();
+        $('#loader').show();
+        var numberOfTokens = $('#numberOfToken').val(); // Corrected the ID to match the HTML
+        App.contracts.ShivTokenSale.deployed().then(function (Instance) {
+            return Instance.buyTokens(numberOfTokens, {
+                from: App.account,
+                value: numberOfTokens * App.tokenPrice,
+                gas: 500000
+            });
+        }).then(function (result) {
+            console.log('Tokens bought...');
+            $('form').trigger('reset'); // Reset number of tokens in form
+            // Wait for Sell event
+        }).catch(function (error) {
+            console.error('Error buying tokens:', error);
+            $('#loader').hide();
+            $('#content').show();
+        });
     }
 }
 
